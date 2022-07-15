@@ -7,6 +7,9 @@ inputs:
   dev-aws-credentials:
     description: The DEV_AWS_CREDENTIALS secret
     required: true
+  ecr-registry:
+    description: The output from aws-actions/amazon-ecr-login
+    required: true
 runs:
   using: composite
   steps:
@@ -28,14 +31,14 @@ runs:
 
     - name: Launch service with dependencies in docker-compose
       env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REGISTRY: ${{ env.ecr-registry }}
       shell: bash
       run: |
         docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${{ matrix.service }}
 
     - name: api-proctor health check test
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REGISTRY: ${{ env.ecr-registry }}
         PGADMIN_PORT: 5000
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
