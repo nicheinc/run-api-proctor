@@ -1,5 +1,12 @@
 name: Run api-proctor tests
 description: Run the api-proctor tests for a backend service repo
+inputs:
+  gha-dev-key:
+    description: The GHA_DEV_KEY secret
+    required: true
+  dev-aws-credentials:
+    description: The DEV_AWS_CREDENTIALS secret
+    required: true
 runs:
   using: composite
   steps:
@@ -8,11 +15,11 @@ runs:
       with:
         repository: nicheinc/development
         ref: 'ci'
-        ssh-key: ${{ secrets.GHA_DEV_KEY }}
+        ssh-key: ${{ inputs.gha-dev-key }}
 
     - name: Create docker-compose override and AWS credentials files
       env:
-        ENCODED_CREDENTIALS: ${{ secrets.DEV_AWS_CREDENTIALS }}
+        ENCODED_CREDENTIALS: ${{ inputs.dev-aws-credentials }}
       shell: bash
       run: |
         sed -i 's/\${REGISTRY}\/${{ matrix.service }}:v[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+/${{ matrix.service }}:latest/g' \
