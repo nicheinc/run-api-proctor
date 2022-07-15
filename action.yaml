@@ -31,14 +31,14 @@ runs:
 
     - name: Launch service with dependencies in docker-compose
       env:
-        REGISTRY: ${{ env.ecr-registry }}
+        REGISTRY: ${{ inputs.ecr-registry }}
       shell: bash
       run: |
         docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${{ matrix.service }}
 
     - name: api-proctor health check test
       env:
-        ECR_REGISTRY: ${{ env.ecr-registry }}
+        ECR_REGISTRY: ${{ inputs.ecr-registry }}
         PGADMIN_PORT: 5000
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
