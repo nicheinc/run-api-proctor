@@ -7,12 +7,6 @@ inputs:
   dev-aws-credentials:
     description: The DEV_AWS_CREDENTIALS secret
     required: true
-env:
-  PGADMIN_PORT: 5000
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
-  POSTGRES_SERVER: postgres
-  POSTGRES_PORT: 5432
 runs:
   using: composite
   steps:
@@ -42,6 +36,11 @@ runs:
     - name: api-proctor health check test
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        PGADMIN_PORT: 5000
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_SERVER: postgres
+        POSTGRES_PORT: 5432
       shell: bash
       run: |
         docker run \
