@@ -1,6 +1,5 @@
 name: Run api-proctor tests
 description: Run the api-proctor tests for a backend service repo
-shell: bash
 runs:
   using: composite
   steps:
@@ -14,6 +13,7 @@ runs:
     - name: Create docker-compose override and AWS credentials files
       env:
         ENCODED_CREDENTIALS: ${{ secrets.DEV_AWS_CREDENTIALS }}
+      shell: bash
       run: |
         sed -i 's/\${REGISTRY}\/${{ matrix.service }}:v[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+/${{ matrix.service }}:latest/g' \
           docker-compose.ci.yaml
@@ -22,12 +22,14 @@ runs:
     - name: Launch service with dependencies in docker-compose
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      shell: bash
       run: |
         docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${{ matrix.service }}
 
     - name: api-proctor health check test
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      shell: bash
       run: |
         docker run \
           --rm \
@@ -37,6 +39,7 @@ runs:
           ${{ matrix.service }}/health.get --testPathIgnorePatterns=/src/ --passWithNoTests
 
     - name: Docker Compose logs
+      shell: bash
       run: |
         echo "::group::Docker ${{ matrix.service }} logs"
         echo "--- Kafka logs ---"
