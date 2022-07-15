@@ -50,7 +50,7 @@ runs:
           --rm \
           --name api-proctor \
           --network host \
-          $ECR_REGISTRY/api-proctor:${{ env.API_PROCTOR_VERSION }} \
+          $ECR_REGISTRY/api-proctor:v1.3.0 \
           ${{ matrix.service }}/health.get --testPathIgnorePatterns=/src/ --passWithNoTests
 
     - name: Docker Compose logs
