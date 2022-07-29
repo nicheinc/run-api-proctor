@@ -25,8 +25,13 @@ runs:
         ENCODED_CREDENTIALS: ${{ inputs.dev-aws-credentials }}
       shell: bash
       run: |
-        sed -i 's/\${REGISTRY}\/${{ matrix.service }}:v[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+/${{ matrix.service }}:latest/g' \
-          docker-compose.ci.yaml
+        for service in ${SERVICES}
+        do
+          sed -i 's/\${REGISTRY}\/${service}:v[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+/${service}:${{ github.run_id }}/g' \
+            docker-compose.ci.yaml
+          sed -i 's/\${REGISTRY}\/${service}:latest/${{ github.run_id }}/g' \
+            docker-compose.ci.yaml
+        done
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
 
     - name: Launch service with dependencies in docker-compose
@@ -34,7 +39,7 @@ runs:
         REGISTRY: ${{ inputs.ecr-registry }}
       shell: bash
       run: |
-        docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${{ matrix.service }}
+        docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${SERVICES}
 
     - name: api-proctor health check test
       env:
@@ -51,16 +56,19 @@ runs:
           --name api-proctor \
           --network host \
           $ECR_REGISTRY/api-proctor:v1.3.0 \
-          ${{ matrix.service }}/health.get --testPathIgnorePatterns=/src/ --passWithNoTests
+          ${{ github.event.repository.name }}/health.get --testPathIgnorePatterns=/src/ --passWithNoTests
 
     - name: Docker Compose logs
       shell: bash
       run: |
-        echo "::group::Docker ${{ matrix.service }} logs"
+        echo "::group::Docker ${{ github.event.repository.name }} logs"
         echo "--- Kafka logs ---"
         docker-compose logs kafka || echo "Kafka not running"
         echo "--- Postgres logs ---"
         docker-compose logs postgres || echo "Postgres not running"
-        echo "--- ${{ matrix.service }} logs ---"
-        docker-compose logs ${{ matrix.service }}
+        for service in ${SERVICES}
+        do
+          echo "--- ${service} logs ---"
+          docker-compose logs ${service}
+        done
         echo "::endgroup::"
