@@ -29,7 +29,6 @@ runs:
           sed -i "s/\(\${REGISTRY}\/\)\?${service}:.\+$/${service}:${{ github.run_id }}/g" \
             docker-compose.ci.yaml
         done
-        cat docker-compose.ci.yaml
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
 
     - name: Launch service with dependencies in docker-compose
