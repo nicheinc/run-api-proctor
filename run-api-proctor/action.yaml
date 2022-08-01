@@ -26,11 +26,7 @@ runs:
       shell: bash
       run: |
         for service in ${SERVICES}; do
-          sed -i 's/\${REGISTRY}\/${service}:v[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+/${service}:${{ github.run_id }}/g' \
-            docker-compose.ci.yaml
-          sed -i 's/\${REGISTRY}\/${service}:latest/${service}:${{ github.run_id }}/g' \
-            docker-compose.ci.yaml
-          sed -i 's/\${service}:latest/${service}:${{ github.run_id }}/g' \
+          sed -i "s/\(\${REGISTRY}\/\)\?${service}:.\+$/${service}:${{ github.run_id }}/g" \
             docker-compose.ci.yaml
         done
         cat docker-compose.ci.yaml
