@@ -25,13 +25,13 @@ runs:
         ENCODED_CREDENTIALS: ${{ inputs.dev-aws-credentials }}
       shell: bash
       run: |
-        for service in ${SERVICES}
-        do
+        for service in ${SERVICES}; do
           sed -i 's/\${REGISTRY}\/${service}:v[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+/${service}:${{ github.run_id }}/g' \
             docker-compose.ci.yaml
           sed -i 's/\${REGISTRY}\/${service}:latest/${{ github.run_id }}/g' \
             docker-compose.ci.yaml
         done
+        cat docker-compose.ci.yaml
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
 
     - name: Launch service with dependencies in docker-compose
@@ -66,8 +66,7 @@ runs:
         docker-compose logs kafka || echo "Kafka not running"
         echo "--- Postgres logs ---"
         docker-compose logs postgres || echo "Postgres not running"
-        for service in ${SERVICES}
-        do
+        for service in ${SERVICES}; do
           echo "--- ${service} logs ---"
           docker-compose logs ${service}
         done
