@@ -30,6 +30,8 @@ runs:
             docker-compose.ci.yaml
           sed -i 's/\${REGISTRY}\/${service}:latest/${service}:${{ github.run_id }}/g' \
             docker-compose.ci.yaml
+          sed -i 's/\${service}:latest/${service}:${{ github.run_id }}/g' \
+            docker-compose.ci.yaml
         done
         cat docker-compose.ci.yaml
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
