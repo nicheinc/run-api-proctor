@@ -20,17 +20,14 @@ runs:
         ref: 'ci'
         ssh-key: ${{ inputs.gha-dev-key }}
 
-    - name: Download cached docker images
-      uses: actions/cache@v3
-      with:
-        path: images
-        key: ${{ github.run_id }}
+    - name: Download docker image artifacts
+      uses: actions/download-artifact@v3
 
     - name: Load docker images
       shell: bash
       run: |
         for service in ${SERVICES}; do
-          docker load --input images/${service}-${{ github.run_id }}.tar
+          docker load --input ${service}.tar
         done
 
     - name: Create docker-compose override and AWS credentials files
@@ -39,7 +36,7 @@ runs:
       shell: bash
       run: |
         for service in ${SERVICES}; do
-          sed -i "s/\(\${REGISTRY}\/\)\?${service}:.\+$/${service}:${{ github.run_id }}/g" \
+          sed -i "s/\(\${REGISTRY}\/\)\?${service}:.\+$/${service}:ci/g" \
             docker-compose.ci.yaml
         done
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
