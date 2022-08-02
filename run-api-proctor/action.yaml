@@ -20,6 +20,19 @@ runs:
         ref: 'ci'
         ssh-key: ${{ inputs.gha-dev-key }}
 
+    - name: Download cached docker images
+      uses: actions/cache@v3
+      with:
+        path: images
+        key: ${{ github.run_id }}
+
+    - name: Load docker images
+      shell: bash
+      run: |
+        for service in ${SERVICES}; do
+          docker load --input images/${service}-${{ github.run_id }}.tar
+        done
+
     - name: Create docker-compose override and AWS credentials files
       env:
         ENCODED_CREDENTIALS: ${{ inputs.dev-aws-credentials }}
@@ -35,8 +48,7 @@ runs:
       env:
         REGISTRY: ${{ inputs.ecr-registry }}
       shell: bash
-      run: |
-        docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${SERVICES}
+      run: docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${SERVICES}
 
     - name: api-proctor health check test
       env:
