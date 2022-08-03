@@ -38,7 +38,7 @@ runs:
         for service in ${SERVICES}; do
           echo -e "  ${service}:\n    image: ${service}:ci" >> docker-compose.ci.yaml
         done
-        cat docker-compose.ci.yaml
+        cat ${{ inputs.ecr-registry }}
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
 
     - name: Launch service with dependencies in docker-compose
