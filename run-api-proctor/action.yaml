@@ -26,8 +26,9 @@ runs:
     - name: Load docker images
       shell: bash
       run: |
+        pwd
         for service in ${SERVICES}; do
-          docker load --input /home/runner/work/entity/entity/${service}.tar
+          docker load --input ${service}/${service}.tar
         done
 
     - name: Create docker-compose override and AWS credentials files
