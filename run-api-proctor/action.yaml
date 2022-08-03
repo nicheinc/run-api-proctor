@@ -22,14 +22,12 @@ runs:
 
     - name: Download docker image artifacts
       uses: actions/download-artifact@v3
-      with:
-        path: .
 
     - name: Load docker images
       shell: bash
       run: |
         for service in ${SERVICES}; do
-          docker load --input ${service}.tar
+          docker load --input /home/runner/work/entity/entity/${service}.tar
         done
 
     - name: Create docker-compose override and AWS credentials files
