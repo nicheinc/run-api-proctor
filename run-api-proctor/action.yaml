@@ -26,7 +26,6 @@ runs:
     - name: Load docker images
       shell: bash
       run: |
-        pwd
         for service in ${SERVICES}; do
           docker load --input ${service}/${service}.tar
         done
