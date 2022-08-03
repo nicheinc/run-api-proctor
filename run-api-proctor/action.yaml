@@ -45,7 +45,7 @@ runs:
       env:
         REGISTRY: ${{ inputs.ecr-registry }}
       shell: bash
-      run: docker-compose -f docker-compose.yaml -f docker-compose.ci.yaml up -d ${SERVICES}
+      run: docker-compose -f docker-compose.yml -f docker-compose.ci.yaml up -d ${SERVICES}
 
     - name: api-proctor health check test
       env:
