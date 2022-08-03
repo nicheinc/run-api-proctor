@@ -17,7 +17,6 @@ runs:
       uses: actions/checkout@v2
       with:
         repository: nicheinc/development
-        ref: 'ci'
         ssh-key: ${{ inputs.gha-dev-key }}
 
     - name: Download docker image artifacts
@@ -35,10 +34,11 @@ runs:
         ENCODED_CREDENTIALS: ${{ inputs.dev-aws-credentials }}
       shell: bash
       run: |
+        echo "services:" >> docker-compose.ci.yaml
         for service in ${SERVICES}; do
-          sed -i "s/\(\${REGISTRY}\/\)\?${service}:.\+$/${service}:ci/g" \
-            docker-compose.ci.yaml
+          echo -e "  ${service}:\n    image: ${service}:ci" >> docker-compose.ci.yaml
         done
+        cat docker-compose.ci.yaml
         echo $ENCODED_CREDENTIALS | base64 -di > vault/aws_credentials
 
     - name: Launch service with dependencies in docker-compose
